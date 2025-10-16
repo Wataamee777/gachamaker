@@ -12,19 +12,17 @@ let textValue = localStorage.getItem('text') || '';
 nameInput.value = nameValue;
 textInput.value = textValue;
 
-// 🔹 再帰的にUnicodeエスケープする関数（英数字以外を変換）
+// 🔹 再帰的にUnicodeエスケープ（バックスラッシュ1本）
 function escapeUnicodeDeep(obj) {
   if (typeof obj === 'string') {
     return obj.replace(/[^ -~]/g, c => {
-      return "\\u" + ("0000" + c.charCodeAt(0).toString(16)).slice(-4);
+      return '\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4);
     });
   } else if (Array.isArray(obj)) {
     return obj.map(escapeUnicodeDeep);
   } else if (typeof obj === 'object' && obj !== null) {
     const newObj = {};
-    for (let key in obj) {
-      newObj[key] = escapeUnicodeDeep(obj[key]);
-    }
+    for (let key in obj) newObj[key] = escapeUnicodeDeep(obj[key]);
     return newObj;
   }
   return obj;
@@ -51,9 +49,12 @@ function updatePreview() {
     Item: items.map(i => ({ Name: i.Name, Money: 0 }))
   };
 
-  // 🔸 再帰的に全体をUnicode化してから stringify
+  // JSON文字列化前にUnicode変換 → stringify → バックスラッシュ補正
   const escaped = escapeUnicodeDeep(json);
-  const str = JSON.stringify(escaped);
+  let str = JSON.stringify(escaped);
+
+  // JSON.stringifyで自動エスケープされた \\u を \u に戻す
+  str = str.replace(/\\\\u/g, '\\u');
 
   preview.textContent = str;
   localStorage.setItem('items', JSON.stringify(items));
