@@ -12,6 +12,13 @@ let textValue = localStorage.getItem('text') || '';
 nameInput.value = nameValue;
 textInput.value = textValue;
 
+// 🔹 非ASCII文字をUnicodeエスケープに変換する関数
+function escapeUnicode(str) {
+  return str.replace(/[\u007F-\uFFFF]/g, c => {
+    return "\\u" + ("0000" + c.charCodeAt(0).toString(16)).slice(-4);
+  });
+}
+
 function renderItems() {
   itemsDiv.innerHTML = '';
   items.forEach((item, index) => {
@@ -32,7 +39,10 @@ function updatePreview() {
     Money: 0,
     Item: items.map(i => ({ Name: i.Name, Money: 0 }))
   };
-  const str = JSON.stringify(json);
+
+  // JSON文字列 → Unicodeエスケープ変換（整形なし）
+  const str = escapeUnicode(JSON.stringify(json));
+
   preview.textContent = str;
   localStorage.setItem('items', JSON.stringify(items));
   localStorage.setItem('name', nameInput.value);
