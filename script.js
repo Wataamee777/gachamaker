@@ -12,11 +12,22 @@ let textValue = localStorage.getItem('text') || '';
 nameInput.value = nameValue;
 textInput.value = textValue;
 
-// 🔹 非ASCII文字をUnicodeエスケープに変換する関数
-function escapeUnicode(str) {
-  return str.replace(/[\u007F-\uFFFF]/g, c => {
-    return "\\u" + ("0000" + c.charCodeAt(0).toString(16)).slice(-4);
-  });
+// 🔹 再帰的にUnicodeエスケープする関数（英数字以外を変換）
+function escapeUnicodeDeep(obj) {
+  if (typeof obj === 'string') {
+    return obj.replace(/[^ -~]/g, c => {
+      return "\\u" + ("0000" + c.charCodeAt(0).toString(16)).slice(-4);
+    });
+  } else if (Array.isArray(obj)) {
+    return obj.map(escapeUnicodeDeep);
+  } else if (typeof obj === 'object' && obj !== null) {
+    const newObj = {};
+    for (let key in obj) {
+      newObj[key] = escapeUnicodeDeep(obj[key]);
+    }
+    return newObj;
+  }
+  return obj;
 }
 
 function renderItems() {
@@ -40,8 +51,9 @@ function updatePreview() {
     Item: items.map(i => ({ Name: i.Name, Money: 0 }))
   };
 
-  // JSON文字列 → Unicodeエスケープ変換（整形なし）
-  const str = escapeUnicode(JSON.stringify(json));
+  // 🔸 再帰的に全体をUnicode化してから stringify
+  const escaped = escapeUnicodeDeep(json);
+  const str = JSON.stringify(escaped);
 
   preview.textContent = str;
   localStorage.setItem('items', JSON.stringify(items));
