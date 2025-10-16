@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sharkbotガチャメーカー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>ガチャメーカー</h1>
+
+  <label>名前 - name: <input id="name" type="text" placeholder="例: 通常ガチャ"></label><br>
+  <label>説明 - description: <input id="text" type="text" placeholder="例: ノーマルガチャ。常設"></label><br>
+
+  <h2>アイテム一覧</h2>
+  <div id="items"></div>
+  <button id="addItem">＋ アイテムを追加</button>
+  <button id="download">💾 JSONをダウンロード</button>
+
+  <h2>JSONプレビュー</h2>
+  <pre id="preview"></pre>
+
+  <script src="script.js"></script>
+</body>
+</html>
